@@ -25,5 +25,5 @@ class ProductUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     price: Optional[PositiveFloat] = None
-    categoria: Optional[str] = None
-    email_fornecedor: Optional[EmailStr] = None
+    category: Optional[str] = None
+    email_supplier: Optional[EmailStr] = None
