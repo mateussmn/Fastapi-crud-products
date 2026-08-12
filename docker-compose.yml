@@ -1,44 +1,71 @@
-version: '3.8'
 services:
   postgres:
-    image: postgres:latest
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    image: postgres:17-alpine
+    container_name: fastapi_postgres
     environment:
       POSTGRES_DB: mydatabase
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - mynetwork
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512m
 
   backend:
     build: 
       context: ./backend
       dockerfile: Dockerfile
-    volumes:
-      - ./backend:/app
+    container_name: fastapi_backend
     environment:
-      DATABASE_URL: postgresql://user:password@postgres/mydatabase
+      DATABASE_URL: postgresql://user:password@postgres:5432/mydatabase
+      PYTHONUNBUFFERED: "1"
     ports:
       - "8000:8000"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - mynetwork
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+          cpus: '1'
 
   frontend:
     build: 
       context: ./frontend
       dockerfile: Dockerfile
-    volumes:
-      - ./frontend:/app
+    container_name: streamlit_frontend
     ports:
       - "8501:8501"
+    depends_on:
+      - backend
     networks:
       - mynetwork
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+    environment:
+      STREAMLIT_SERVER_HEADLESS: "true"
 
 networks:
   mynetwork:
+    driver: bridge
 
 volumes:
   postgres_data:
+    driver: local
