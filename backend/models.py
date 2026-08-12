@@ -3,7 +3,7 @@ from sqlalchemy.sql import func
 from database import Base
 
 class ProductModel(Base):
-    __tablename__ = "products"  # esse será o nome da tabela
+    __tablename__ = "products"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
