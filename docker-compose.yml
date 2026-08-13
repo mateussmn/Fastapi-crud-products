@@ -22,7 +22,7 @@ services:
           memory: 512m
 
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: fastapi_backend
@@ -41,15 +41,15 @@ services:
       resources:
         limits:
           memory: 512m
-          cpus: '1'
+          cpus: "1"
 
   frontend:
-    build: 
-      context: ./frontend
+    build:
+      context: ./frontend/react-app
       dockerfile: Dockerfile
-    container_name: streamlit_frontend
+    container_name: react_frontend
     ports:
-      - "8501:8501"
+      - "5173:5173"
     depends_on:
       - backend
     networks:
@@ -59,8 +59,6 @@ services:
       resources:
         limits:
           memory: 512m
-    environment:
-      STREAMLIT_SERVER_HEADLESS: "true"
 
 networks:
   mynetwork:
